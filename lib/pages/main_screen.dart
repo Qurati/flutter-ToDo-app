@@ -11,15 +11,34 @@ class MainScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Список дел'),
         centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
       ),
       body: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('main screen'),
-          ElevatedButton(
+          ElevatedButton.icon(
+            iconAlignment: IconAlignment.end,
+            icon: Icon(
+              Icons.check,
+              color: Colors.green,
+              size: 30.0,
+            ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/complete');
+              },
+              label: Text('Перейти к завершенным делам')),
+
+          ElevatedButton.icon(
+              iconAlignment: IconAlignment.end,
+              icon: Icon(
+                Icons.circle_outlined,
+                color: Colors.orange,
+                size: 30.0,
+              ),
               onPressed: () {
                 Navigator.pushNamed(context, '/todo');
               },
-              child: Text('Перейти к списку дел'))
+              label: Text('Перейти к списку дел')),
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo/pages/home.dart';
+import 'package:todo/pages/complete_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:todo/pages/main_screen.dart';
 
@@ -14,6 +15,7 @@ void main() async {
     routes: {
       '/': (context) => MainScreen(),
       '/todo': (context) => Home(),
+      '/complete': (context) => Complete(),
     },
   ));
 }

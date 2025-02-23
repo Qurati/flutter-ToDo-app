@@ -24,8 +24,9 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
-        title: Text('ToDo'),
+        title: Text('Список дел'),
         centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('items').snapshots(),
@@ -39,7 +40,39 @@ class _HomeState extends State<Home> {
 
               return Dismissible(
                 key: Key(itemDoc.id),
-                background: Container(color: Colors.red),
+                background: Container(
+                    color: Colors.green,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Icon(Icons.check, color: Colors.white),
+                  ),
+                ),
+                ),
+                  secondaryBackground: const ColoredBox(
+                    color: Colors.redAccent,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                direction: DismissDirection.horizontal,
+                onDismissed: (DismissDirection direction) {
+                  // Удаление элемента из Firestore при смахивании
+                  if(direction==DismissDirection.endToStart){
+                    FirebaseFirestore.instance.collection('items').doc(itemDoc.id).delete();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Удалено")));
+                  }
+                  if(direction==DismissDirection.startToEnd){
+                    FirebaseFirestore.instance.collection('comp').add({'comp': itemDoc.get('item')});
+                    FirebaseFirestore.instance.collection('items').doc(itemDoc.id).delete();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Завершено")));
+                  }
+                  },
                 child: Card(
                   child: ListTile(
                     title: Text(itemDoc.get('item')),
@@ -51,36 +84,36 @@ class _HomeState extends State<Home> {
                       onPressed: () {
                         // Удаление элемента из Firestore
                         FirebaseFirestore.instance.collection('items').doc(itemDoc.id).delete();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Удалено")));
                       },
                     ),
                   ),
-                ),
-                onDismissed: (direction) {
-                  // Удаление элемента из Firestore при смахивании
-                  FirebaseFirestore.instance.collection('items').doc(itemDoc.id).delete();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Item dismissed")));
-                },
+                )
               );
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Colors.green,
         onPressed: (){
             showDialog(context: context, builder: (BuildContext context){
               return AlertDialog(
                 title: Text('Добавить дело'),
                 content: TextField(
+                  decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50)
+                  ),
+                      hintText: 'Введите дело'
+                  ),
                   onChanged: (String value) {
                     _userInput = value;
-
                   },
                 ),
                 actions: [
                   ElevatedButton(onPressed: (){
                       FirebaseFirestore.instance.collection('items').add({'item': _userInput});
-
                       Navigator.of(context).pop();
                   }, child: Text('Добавить'))
                 ],
